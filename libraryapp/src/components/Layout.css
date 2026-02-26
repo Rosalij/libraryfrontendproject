@@ -40,7 +40,6 @@ a {
     font-weight: 700;
     font-size: 0.7em;
 }
-
 li:hover {
     color: #ffffff;
     cursor: pointer;
@@ -49,22 +48,37 @@ li:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+footer {
+    background-color: #2a3e47;
+    color: rgb(255, 221, 182);
+    text-align: center;
+    padding: 1em;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    font-family: "noto serif", serif    ;
+}
 
 header {
     background-color: #2a3e47;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 19vh;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.336);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
+header div {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
 .headerTitle {
-    font-size: 2em;
-    font-weight: bold;
-    color: rgb(255, 221, 182);
+   
+    font-weight:200;
+    color: rgb(201, 238, 245);
 
-    font-family: "noto serif", serif    ;
+    font-family: "manrope", serif    ; 
+    font-size: 2em;
 }
 
 

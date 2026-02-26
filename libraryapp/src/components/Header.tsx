@@ -3,9 +3,9 @@ import { NavLink } from 'react-router-dom'
 function Header() {
     return (
         <div>
-            <header> <img src="src/assets/books.png" alt="books icon" width="200" />
-                <p className="headerTitle">The Book Palace</p>
-                <nav>
+            <header><NavLink to="/"> <div><img src="src/assets/books.png" alt="books icon" width="200" />
+                <p className="headerTitle">Bookshelf Reviews</p></div>
+              </NavLink>  <nav>
                 <ul>
                     <li><NavLink to="/">Home</NavLink></li>
                     <li><NavLink to="/books">Books</NavLink></li>
