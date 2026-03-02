@@ -13,6 +13,12 @@ body {
     font-family: 'Manrope', sans-serif;
 }
 
+main {
+       display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+}
+
 ul {
     display: flex;
     gap: 1em;
@@ -70,13 +76,16 @@ footer {
     color: rgb(255, 221, 182);
     text-align: center;
     padding: 1em;
-    position:absolute;
+
     bottom:0;
     width: 100%;
     
     font-family: "noto serif", serif;
 }
-
+.logo img {
+    width: 10em;
+    padding-left: 2em;
+}
 header {
     background-color: #2a3e47;
     height: 19vh;
@@ -106,15 +115,20 @@ header div {
     header {
         flex-direction: column;
         align-items: center;
+
     }
 
     li {
-        width: 100%;
+        width: 20%;
         text-align: center;
     }
 
     ul {
 
         gap: 0.5em;
+    }
+
+    .logo img{
+        width: 5em;
     }
 }

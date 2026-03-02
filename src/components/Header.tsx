@@ -8,7 +8,7 @@ function Header() {
     return (
         <header>
             <NavLink to="/">
-                <div>
+                <div className='logo'>
                     <img src="src/assets/books.png" alt="books icon" width="200" />
                     <p className="headerTitle">Bookshelf Reviews</p>
                 </div>

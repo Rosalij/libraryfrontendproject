@@ -1,52 +1,49 @@
 import { createBrowserRouter } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import BookPage from "./pages/BookPage";
-import SingleBookPage from "./pages/SingleBookPage";
 import Layout from "./components/Layout";
+import HomePage from "./pages/HomePage";
+import BookSearch from "./components/BookSearch";
+import BookPage from "./pages/BookPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import RegisterPage from "./pages/RegisterPage"
+import SingleBookPage from "./pages/SingleBookPage";
+
 const router = createBrowserRouter([
-
-    {
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
         path: "/",
-        element: <Layout />,
-        children: [
-            {
-                path: "/",
-                element: <HomePage />
-            },
-            {
-                path: "/login",
-                element: <LoginPage />
-            },
-             {
-                path: "/register",
-                element: (
-                     <RegisterPage />
-                )
-            },
-            {
-                path: "/books",
-                element: (
-                    <ProtectedRoute>  <BookPage /></ProtectedRoute>
-                )
-            },
-            {
-                path: "/books/:id",
-                element: (<ProtectedRoute><SingleBookPage /></ProtectedRoute>)
-            },
-            {
-                path: "/profile",
-                element: (<ProtectedRoute><ProfilePage /></ProtectedRoute>)
-            },
-            {
-                path: "/reviews",
-                element: (<ProtectedRoute><h1>Reviews</h1></ProtectedRoute>)
-            }
-        ]
-    }
+        element: <HomePage />
+      },
+      {
+        path: "/books",
+        element: <BookPage /> // Book search page, public or protected
+      },
+      {
+        path: "/book/:bookId",
+        element: <SingleBookPage /> // Book info + reviews page
+      },
+      {
+        path: "/login",
+        element: <LoginPage />
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        )
+      }
+    ]
+  }
+]);
 
-])
 export default router;

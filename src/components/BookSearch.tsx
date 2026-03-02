@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Book {
   id: string;
@@ -16,8 +17,9 @@ function BookSearch() {
   const [error, setError] = useState("");
   const [startIndex, setStartIndex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const navigate = useNavigate();
 
-  const maxResults = 10; // number of books per page
+  const maxResults = 8;
 
   const fetchBooks = async (newStartIndex: number) => {
     if (!query) return;
@@ -27,9 +29,7 @@ function BookSearch() {
 
     try {
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-          query
-        )}&startIndex=${newStartIndex}&maxResults=${maxResults}`
+        `https://librarybackend-c0p9.onrender.com/api/books/search?q=${encodeURIComponent(query)}&startIndex=${newStartIndex}`
       );
       const data = await res.json();
 
@@ -44,7 +44,7 @@ function BookSearch() {
       setTotalItems(data.totalItems || 0);
       setStartIndex(newStartIndex);
     } catch (err) {
-      console.error("Search error:", err);
+      console.error(err);
       setError("Something went wrong. Try again.");
     } finally {
       setLoading(false);
@@ -53,18 +53,11 @@ function BookSearch() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchBooks(0); // start from the first page
+    fetchBooks(0);
   };
 
-  const handlePrev = () => {
-    if (startIndex === 0) return;
-    fetchBooks(Math.max(0, startIndex - maxResults));
-  };
-
-  const handleNext = () => {
-    if (startIndex + maxResults >= totalItems) return;
-    fetchBooks(startIndex + maxResults);
-  };
+  const handlePrev = () => fetchBooks(Math.max(0, startIndex - maxResults));
+  const handleNext = () => fetchBooks(startIndex + maxResults);
 
   return (
     <div style={{ padding: "1rem" }}>
@@ -88,7 +81,7 @@ function BookSearch() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
           gap: "1rem",
         }}
       >
@@ -98,25 +91,30 @@ function BookSearch() {
             style={{
               border: "1px solid #ccc",
               borderRadius: "8px",
-              padding: "0.5rem",
               textAlign: "center",
               backgroundColor: "#f9f9f9",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "1rem",
+              alignItems: "center",
             }}
           >
             <img
-              src={book.volumeInfo.imageLinks?.thumbnail || "src/assets/placeholder.jpg"}
+              src={book.volumeInfo.imageLinks?.thumbnail || "/placeholder.jpg"}
               alt={book.volumeInfo.title}
-              style={{ width: "100px", height: "150px", objectFit: "cover", marginBottom: "0.5rem" }}
+              style={{ width: "110px", height: "130px", objectFit: "cover", marginBottom: "0.5rem" }}
             />
             <h4 style={{ fontSize: "0.9rem" }}>{book.volumeInfo.title}</h4>
-            <p style={{ fontSize: "0.8rem", color: "#555" }}>
+            <p style={{ fontSize: "0.7rem", fontWeight: "600", color: "#555" }}>
               {book.volumeInfo.authors?.join(", ") || "Unknown Author"}
             </p>
             <button
-              style={{ marginTop: "0.5rem", padding: "0.3rem 0.5rem" }}
-              onClick={() => alert(`Selected book ID: ${book.id}`)}
+              onClick={() =>
+                navigate(`/book/${book.id}`)
+              }
             >
-              Select
+              More info & reviews⭐
             </button>
           </div>
         ))}
