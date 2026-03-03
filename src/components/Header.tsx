@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext"
 function Header() {
     const { user, logout } = useAuth();
 
+
     return (
         <header>
             <NavLink to="/">
@@ -21,22 +22,17 @@ function Header() {
                         <NavLink to="/" className={({ isActive }) => isActive ? "active-link" : ""}>
                             Home
                         </NavLink>
-                    </li>
+                    </li>     <li>
+                            <NavLink to="/books" className={({ isActive }) => isActive ? "active-link" : ""}>
+                                Books
+                            </NavLink>
+                        </li>
+
+
 
                     {/* Only show when logged in */}
                     {user && (
                         <>
-                            <li>
-                                <NavLink to="/books" className={({ isActive }) => isActive ? "active-link" : ""}>
-                                    Books
-                                </NavLink>
-                            </li>
-
-                            <li>
-                                <NavLink to="/reviews" className={({ isActive }) => isActive ? "active-link" : ""}>
-                                    ⭐ Reviews
-                                </NavLink>
-                            </li>
 
                             <li>
                                 <NavLink to="/profile" className={({ isActive }) => isActive ? "active-link" : ""}>
