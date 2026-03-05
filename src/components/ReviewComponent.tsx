@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import StarRating from "./StarRating";
 
 interface Review {
   _id: string;
@@ -108,18 +109,13 @@ const BookReviews: React.FC<BookReviewsProps> = ({ bookId }) => {
           required
         />
         <div style={{ margin: "0.5rem 0" }}>
-          Rating:
-          <select
-            value={newRating}
-            onChange={(e) => setNewRating(Number(e.target.value))}
-            style={{ marginLeft: "0.5rem" }}
-          >
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>
-                {n} ⭐
-              </option>
-            ))}
-          </select>
+          <p>Rate this book:</p>
+         <StarRating
+  rating={newRating}
+  editable
+  onChange={(val) => setNewRating(val)}
+/>
+       
         </div>
         <button type="submit">Submit Review</button>
       </form>

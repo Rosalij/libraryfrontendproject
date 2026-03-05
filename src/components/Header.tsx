@@ -10,7 +10,7 @@ function Header() {
         <header>
             <NavLink to="/">
                 <div className='logo'>
-                    <img src="src/assets/books.png" alt="books icon" width="200" />
+                    <img src="./src/assets/books.png" alt="books icon" width="200" />
                     <p className="headerTitle">Bookshelf Reviews</p>
                 </div>
             </NavLink>
@@ -36,8 +36,13 @@ function Header() {
 
                             <li>
                                 <NavLink to="/profile" className={({ isActive }) => isActive ? "active-link" : ""}>
-                                    <img src="src/assets/account_circle.svg" alt="account icon" width="20" />
+                                    <img src="../src/assets/account_circle.svg" alt="account icon" width="20" />
                                     Profile
+                                </NavLink>
+                            </li>
+                               <li>
+                                <NavLink to="/users" className={({ isActive }) => isActive ? "active-link" : ""}>
+                                    Friends
                                 </NavLink>
                             </li>
                         </>

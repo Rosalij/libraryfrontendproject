@@ -7,6 +7,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SingleBookPage from "./pages/SingleBookPage";
+import UsersPage from "./pages/UsersPage";
+import UserPage from "./pages/userPage";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <HomePage />
       },
+ 
+      { path: "/Users",
+        element:<UsersPage /> // Users page
+       },
       {
         path: "/books",
         element: <BookPage /> // Book search page, public or protected
@@ -40,6 +46,10 @@ const router = createBrowserRouter([
             <ProfilePage />
           </ProtectedRoute>
         )
+      },
+      {
+        path: "/user/:id",
+        element: <UserPage />
       }
     ]
   }

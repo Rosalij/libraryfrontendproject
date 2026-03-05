@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import StarRating from "../components/StarRating";
 
 interface Review {
   _id: string;
@@ -8,14 +9,22 @@ interface Review {
   reviewText: string;
   rating: number;
   createdAt: string;
-  bookTitle?: string;
-  thumbnail?: string;
+}
+
+interface BookData {
+  title: string;
+  thumbnail: string;
 }
 
 function ProfilePage() {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [books, setBooks] = useState<Record<string, BookData>>({});
   const [loading, setLoading] = useState(true);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [editRating, setEditRating] = useState(0);
 
   const token = localStorage.getItem("token");
 
@@ -25,7 +34,7 @@ function ProfilePage() {
 
       try {
         const res = await fetch(
-          "https://librarybackend-c0p9.onrender.com/api/user/my-reviews",
+          "https://librarybackend-c0p9.onrender.com/api/reviews/my-reviews",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -33,29 +42,47 @@ function ProfilePage() {
           }
         );
 
-        const data = await res.json();
+        const reviewData = await res.json();
+        setReviews(reviewData);
 
-        const enriched = await Promise.all(
-          data.map(async (review: Review) => {
+        // 🔥 Hämta unika bookIds
+        const uniqueBookIds = [
+          ...new Set(reviewData.map((r: Review) => r.bookId)),
+        ];
+
+        const bookResults = await Promise.all(
+          uniqueBookIds.map(async (id: string) => {
             try {
-              const bookRes = await fetch(
-                `https://librarybackend-c0p9.onrender.com/api/books/${review.bookId}`
+              const res = await fetch(
+                `https://librarybackend-c0p9.onrender.com/api/books/${id}`
               );
-              const bookData = await bookRes.json();
+              const data = await res.json();
 
               return {
-                ...review,
-                bookTitle: bookData.volumeInfo?.title || "Unknown Title",
+                id,
+                title: data.volumeInfo?.title || "Unknown Title",
                 thumbnail:
-                  bookData.volumeInfo?.imageLinks?.thumbnail || "",
+                  data.volumeInfo?.imageLinks?.thumbnail || "",
               };
             } catch {
-              return review;
+              return {
+                id,
+                title: "Unknown Title",
+                thumbnail: "",
+              };
             }
           })
         );
 
-        setReviews(enriched);
+        const bookMap: Record<string, BookData> = {};
+        bookResults.forEach((b) => {
+          bookMap[b.id] = {
+            title: b.title,
+            thumbnail: b.thumbnail,
+          };
+        });
+
+        setBooks(bookMap);
       } catch {
         setReviews([]);
       } finally {
@@ -66,89 +93,151 @@ function ProfilePage() {
     fetchReviews();
   }, [token]);
 
-  const renderStars = (rating: number) => {
-    return (
-      <span style={{ color: "#f5a623", fontSize: "1rem" }}>
-        {[1, 2, 3, 4, 5].map((star) =>
-          star <= rating ? "★" : "☆"
-        )}
-      </span>
+  const startEditing = (review: Review) => {
+    setEditingId(review._id);
+    setEditText(review.reviewText);
+    setEditRating(review.rating);
+  };
+
+  const handleUpdate = async (id: string) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `https://librarybackend-c0p9.onrender.com/api/reviews/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            reviewText: editText,
+            rating: editRating,
+          }),
+        }
+      );
+
+      const updated = await res.json();
+
+      setReviews((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, ...updated } : r))
+      );
+
+      setEditingId(null);
+    } catch {
+      console.error("Update failed");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!token) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this review?"
     );
+    if (!confirmDelete) return;
+
+    try {
+      await fetch(
+        `https://librarybackend-c0p9.onrender.com/api/reviews/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+    } catch {
+      console.error("Delete failed");
+    }
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "1000px",
-        margin: "3rem auto",
-        padding: "2rem",
-        fontFamily: "Georgia, serif",
-      }}
-    >
-      <h1 style={{ marginBottom: "1rem" }}>Your Profile</h1>
-
-      <div style={{ marginBottom: "2rem" }}>
-        <h2>Welcome, {user?.username}</h2>
-        <p style={{ color: "#666" }}>Email: {user?.email}</p>
-      </div>
-
-      <h3 style={{ marginBottom: "1.5rem" }}>Your Reviews</h3>
-
+    <div style={{ maxWidth: "1000px", margin: "3rem auto", padding: "2rem", backgroundColor:"#e6e6e6", borderRadius: "2em"}}>
+      <h1>Your Profile</h1>
+      <h2>Welcome to your book collection, {user?.username}</h2>
+<br /> <h3>Your reviews:</h3>
       {loading ? (
-        <p>Loading reviews...</p>
+        <p>Loading...</p>
       ) : reviews.length === 0 ? (
         <p>You have not written any reviews yet.</p>
       ) : (
-        reviews.map((r) => (
-          <div
-            key={r._id}
-            style={{
-              display: "flex",
-              gap: "1.5rem",
-              padding: "1.5rem 0",
-              borderBottom: "1px solid #eee",
-              alignItems: "center",
-            }}
-          >
-            <img
-              src={r.thumbnail || "/placeholder.jpg"}
-              alt={r.bookTitle}
+        reviews.map((r) => {
+          const book = books[r.bookId];
+
+          return (
+            <div
+              key={r._id}
               style={{
-                width: "80px",
-                height: "120px",
-                objectFit: "cover",
-                borderRadius: "6px",
-                boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+                display: "flex",
+                gap: "1.5rem",
+                padding: "1.5rem 0",
+                borderBottom: "1px solid #000000",
               }}
-            />
-
-            <div style={{ flex: 1 }}>
-              <Link
-                to={`/books/${r.bookId}`}
+            >
+              <img
+                src={book?.thumbnail || "/placeholder.jpg"}
+                alt={book?.title}
                 style={{
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  color: "#111",
+                  width: "100px",
+                  objectFit: "contain",
+    
                 }}
-              >
-                {r.bookTitle}
-              </Link>
+              />
 
-              <div style={{ margin: "0.5rem 0" }}>
-                {renderStars(r.rating)}
+              <div style={{ flex: 1 }}>
+                <Link to={`/book/${r.bookId}`} style={{color:"black"}}>
+                  {book?.title || "Unknown Title"}
+                </Link>
+
+                {editingId === r._id ? (
+                  <>
+                    <StarRating
+                      rating={editRating}
+                      editable
+                      onChange={(val) => setEditRating(val)}
+                    />
+<div>
+                    <textarea style={{width: "30em", height: "10em", border: "none", fontFamily:"manrope", margin: "1em"}}
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                    />
+  </div>
+                    <button style={{ marginRight: "3em", width: "7em", color: "white" }} onClick={() => handleUpdate(r._id)}>
+                      Save
+                    </button>
+                    <button style={{width: "7em", color: "white" }} onClick={() => setEditingId(null)}>
+                      Cancel
+                    </button>
+                </>
+                ) : (
+                  <>
+                    <StarRating rating={r.rating} />
+                    <p>{r.reviewText}</p>
+                    <small>
+                      {new Date(r.createdAt).toLocaleDateString()}
+                    </small>
+
+                    <div style={{display:"flex", justifyContent:"space-around"}}>
+                      <button style={{width: "7em"}}onClick={() => startEditing(r)}>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r._id)}
+                        style={{width: "7em", color: "white" }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-
-              <p style={{ marginBottom: "0.5rem" }}>
-                {r.reviewText}
-              </p>
-
-              <span style={{ fontSize: "0.85rem", color: "#888" }}>
-                {new Date(r.createdAt).toLocaleDateString()}
-              </span>
             </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

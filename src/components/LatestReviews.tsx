@@ -61,19 +61,21 @@ const LatestReviews: React.FC = () => {
   if (loading) return <p>Loading latest reviews...</p>;
 
   const renderStars = (rating: number) => {
-  return (
-    <span style={{ color: "#f5a623", fontSize: "1rem" }}>
-      {[1, 2, 3, 4, 5].map((star) =>
-        star <= rating ? "★" : "☆"
-      )}
-    </span>
-  );
-};
+    return (
+      <span style={{ color: "#f5a623", fontSize: "1.4rem" }}>
+        {[1, 2, 3, 4, 5].map((star) =>
+          star <= rating ? "★" : "☆"
+        )}
+      </span>
+    );
+  };
 
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2>Latest Reviews</h2>
+    <div style={{
+      margin: "auto", display: "flex", flexDirection: "column", justifyContent: "space-around", padding: "2em", backgroundColor: "white", borderRadius: "2em", marginBottom: "2em"
+    }}>
+      <h2 style={{margin: "2em"}}>Latest Reviews</h2>
 
       {reviews.length === 0 ? (
         <p>No reviews yet.</p>
@@ -87,26 +89,30 @@ const LatestReviews: React.FC = () => {
               borderBottom: "1px solid #ccc",
               padding: "1rem 0",
               alignItems: "center",
+              
             }}
           >
             {/* Book Image */}
             <img
               src={r.thumbnail || "./placeholder.jpg"}
               alt={r.title}
-              style={{ width: "80px", height: "120px", objectFit: "cover" }}
+              style={{ width: "100px", objectFit: "cover" }}
             />
 
             {/* Review Info */}
-            <div>
+            <div style={{
+              display: "flex", width: "100%", flexDirection: "column",
+              gap: "1em"
+            }}>
               <h4>{r.title}</h4>
-           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-  <strong>{r.user?.username || "Unknown"}</strong>
-  {renderStars(r.rating)}
-</div>
+              <div style={{alignItems: "center", gap: "0.5rem" }}>
+                <strong>{r.user?.username || "Unknown"}</strong>
+                {renderStars(r.rating)}
+              </div>
 
               <p>{r.reviewText}</p>
 
-              <Link to={`/book/${r.bookId}`} style={{color: "black"}}>
+              <Link to={`/book/${r.bookId}`} style={{ color: "black",width: "100%",}}>
                 View Book →
               </Link>
             </div>
