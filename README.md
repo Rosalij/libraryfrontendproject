@@ -6,7 +6,7 @@ This project is the frontend part of my application called Bookpal Reviews. It a
 
 The application is built using React and react states and components, and communicates with a Node.js/Express backend that provides review and user data and integrates with the Google Books API.
 
-Link to backend repository: (https://github.com/Rosalij/librarybackend.git)
+Link to backend repository: (https://github.com/Rosalij/BookpalReviewsBackend.git)
 
 ---
 
